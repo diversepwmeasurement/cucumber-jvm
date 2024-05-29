@@ -1,24 +1,25 @@
-name: Release Maven
-
-on:
-  push:
-    branches: [release/*]
-
 jobs:
   publish-mvn:
-    name: Publish Maven Package
-    runs-on: ubuntu-latest
     environment: Release
+    name: Publish Maven Package
+    runs-on: self-hosted
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-          cache: 'maven'
-      - uses: cucumber/action-publish-mvn@v2.0.0
-        with:
-          gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
-          gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
-          nexus-username: ${{ secrets.SONATYPE_USERNAME }}
-          nexus-password: ${{ secrets.SONATYPE_PASSWORD }}
+    - continue-on-error: true
+      uses: actions/checkout@v4
+    - continue-on-error: true
+      uses: actions/setup-java@v4
+      with:
+        cache: maven
+        distribution: zulu
+        java-version: '17'
+    - continue-on-error: true
+      uses: cucumber/action-publish-mvn@v2.0.0
+      with:
+        gpg-passphrase: ${{ secrets.GPG_PASSPHRASE }}
+        gpg-private-key: ${{ secrets.GPG_PRIVATE_KEY }}
+        nexus-password: ${{ secrets.SONATYPE_PASSWORD }}
+        nexus-username: ${{ secrets.SONATYPE_USERNAME }}
+name: Release Maven
+on:
+  repository_dispatch:
+    types: trigger-ga___release-java.yml
